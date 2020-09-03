@@ -41,7 +41,7 @@ def check_blanks(blank_list, ref_length=29000):
         if current_coverage > max_coverage:
             max_coverage = current_coverage
         if current_reads > max_reads:
-            max_recovery = current_reads                        
+            max_reads = current_reads                        
     return max_coverage, max_recovery_10, max_recovery_20, max_reads
 
 def get_sample_metrics(bam_file):
@@ -55,6 +55,20 @@ def get_sample_metrics(bam_file):
     return coverage, recovery_10, recovery_20, reads
 
 def calculate_metrics(args): 
+    # prepopulate ct data from input table 
+    all_samples = {}
+    platform = 'ILLUMINA'
+    if args.ont:
+        platform = 'OXFORD_NANOPORE'
+    if args.ctdata:
+        for record in csv.DictReader(open(args.ctdata), dialect=csv.excel_tab): 
+            cts = [record.get("ct_1_ct_value", 0.0), record.get("ct_2_ct_value", 0.0)]
+            all_samples[record["central_sample_id"]] = dict(sequencing_platform = platform, sample_name=record["central_sample_id"], ct_platform_1 = record.get('ct_platform_1', 'UNKNOWN'), ct_platform_2 = record.get('ct_platform_2', 'UNKNOWN'), max_ct_value=max(cts), min_ct_value=min(cts))
+    else:
+        for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam]: 
+            sample_name = path.basename(bam_file)
+            all_samples[sample_name] = dict(sequencing_platform = platform, sample_name=sample_name, ct_platform_1 = 'UNKNOWN', ct_platform_2 = 'UNKNOWN', max_ct_value=0.0, min_ct_value=0.0)
+
     # Create path for blanks
     blank_paths = [path.join(args.bamfolder, blank_file) for blank_file in args.blankbam]
     input_good = True
@@ -81,11 +95,10 @@ def calculate_metrics(args):
             log.info('RUN SKIPPED: Specified Blanks from this run have too much SARSCOV2 content')
         else:
             log.info('BLANKS OK!')
-            all_samples = {}
             for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam]: 
                 coverage, recovery_10, recovery_20, reads = get_sample_metrics(bam_file)
                 # TODO: Include mapping/lookup table
-                all_samples[path.basename(bam_file)] = dict(sample_name=path.basename(bam_file), mean_cov=coverage, pc_pos_gte_20=recovery_20, pc_pos_gte_10=recovery_10, no_reads=reads)
+                all_samples[path.basename(bam_file)].update(dict(mean_cov=coverage, pc_pos_gte_20=recovery_20, pc_pos_gte_10=recovery_10, no_reads=reads))
             db_path = path.join(args.db, f'ronaldo.db.{path.basename(args.bamfolder)}.csv')
             db_out = csv.DictWriter(open(db_path, 'w'), fieldnames=list(all_samples.values())[0].keys())
             db_out.writeheader()
@@ -124,7 +137,7 @@ if __name__ == '__main__':
     metrics_parser.set_defaults(func=calculate_metrics)
 
     # Filter parser
-    filter_parser = subparsers.add_parser('filter', help='Update Lineage values')
+    filter_parser = subparsers.add_parser('filter', help='Filter metric results, determine false positives')
     filter_parser.add_argument('-d','--db', action='store',help='DB directory', default='ronaldo_db')
     filter_parser.add_argument('-o','--output',action='store',help='output directory', default='ronaldo_out')
     filter_parser.add_argument('-c','--coverage',action='store',help='Minimum coverage for fully mapped reads', default=1)
