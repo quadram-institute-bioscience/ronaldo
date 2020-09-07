@@ -52,6 +52,8 @@ You should also specify a metadata file with the CT information, it should look 
 |---------------------|-------------|----------------|----------------|--------------|--------------|-----------------------|
 | ILLUMINA            | MY_SAMPLE1  | AUSDIAGNOSTICS | AUSDIAGNOSTICS | 15           | 15           | my_sample1.sorted.bam |
 
+**See example in templates/ct_metadata.csv**
+
 Minimum usage should therefore be:
 
 ```
@@ -107,6 +109,8 @@ must be the following columns with the exact names below:
 * **pc_pos_gte_20**	: % of bases that were greater than 20X (genome recovery - used for ONT)
 * **pc_pos_gte_10**	: % of bases that were greater than 10X (genome recovery - used for Illumina)
 * **no_reads** : Number of mapped reads 
+
+**See example in templates/ronaldo_db_example.csv**
 
 The cut-offs are scaled as per the amount detected in the corresponding blank, so it is important to provide 
 those values. Adding the run name also helps us detect any batch effects. There are optional flags to change
