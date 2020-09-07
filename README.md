@@ -2,6 +2,9 @@
 Comparison tool of SARSCOV2 seq and assays
 
 ## Install
+
+*Runs on Python 3.7.6*
+
 ```
 pip install -r requirements.txt 
 python ronaldo/ronaldo.py -h 
