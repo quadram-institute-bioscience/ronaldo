@@ -89,24 +89,24 @@ optional arguments:
 
 The filtering module is expecting a specified directory (db), with multiple csv files. Each csv file 
 could be describing a run (generated from "calculate"). There should be one record/row per sample. There 
-must be the following headers with the exact names below:
+must be the following columns with the exact names below:
 
-* sample_name	: Unique ID (COG ID)
-* runname	: A descriptive name of a run. 
-* filename	: The corresponding BAM filename for this record
-* sequencing_platform	: ILLUMINA or OXFORD_NANOPORE only 
-* ct_platform_1 : Platform for 1st CT test e.g. AUSDIAGNOSTICS, ROCHE, HOLOLOGIC.
-* ct_platform_2	: Platform for 2nd CT test e.g. AUSDIAGNOSTICS, ROCHE, HOLOLOGIC.
-* max_ct_value	: Of the two tests, what is the maximum CT value
-* min_ct_value	: Of the two tests, what is the minimum CT value
-* blank_coverage	: mean sequencing coverage for the BLANK for this run. 
-* blank_recovery_10	: % of bases that were greater than 10X for the BLANK (genome recovery - used for Illumina)
-* blank_recovery_20	: % of bases that were greater than 20X for the BLANK (genome recovery - used for ONT)
-* blank_reads	: Number of mapped reads in the BLANK for this run
-* mean_cov	: mean sequencing coverage
-* pc_pos_gte_20	: % of bases that were greater than 20X (genome recovery - used for ONT)
-* pc_pos_gte_10	: % of bases that were greater than 10X (genome recovery - used for Illumina)
-* no_reads : Number of mapped reads 
+* **sample_name**	: Unique ID (COG ID)
+* **runname**	: A descriptive name of a run. 
+* **filename**	: The corresponding BAM filename for this record
+* **sequencing_platform**	: ILLUMINA or OXFORD_NANOPORE only 
+* **ct_platform_1** : Platform for 1st CT test e.g. AUSDIAGNOSTICS, ROCHE, HOLOLOGIC.
+* **ct_platform_2**	: Platform for 2nd CT test e.g. AUSDIAGNOSTICS, ROCHE, HOLOLOGIC.
+* **max_ct_value**	: Of the two tests, what is the maximum CT value
+* **min_ct_value**	: Of the two tests, what is the minimum CT value
+* **blank_coverage**	: mean sequencing coverage for the BLANK for this run. 
+* **blank_recovery_10**	: % of bases that were greater than 10X for the BLANK (genome recovery - used for Illumina)
+* **blank_recovery_20**	: % of bases that were greater than 20X for the BLANK (genome recovery - used for ONT)
+* **blank_reads**	: Number of mapped reads in the BLANK for this run
+* **mean_cov**	: mean sequencing coverage
+* **pc_pos_gte_20**	: % of bases that were greater than 20X (genome recovery - used for ONT)
+* **pc_pos_gte_10**	: % of bases that were greater than 10X (genome recovery - used for Illumina)
+* **no_reads** : Number of mapped reads 
 
 The cut-offs are scaled as per the amount detected in the corresponding blank, so it is important to provide 
 those values. Adding the run name also helps us detect any batch effects. There are optional flags to change
