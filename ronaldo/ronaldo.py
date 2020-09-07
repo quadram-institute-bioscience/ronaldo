@@ -111,7 +111,6 @@ def calculate_metrics(args):
 
 
 def assess_run(args):
-    print(args)
     # Read dir. 
     all_records = {} 
     for data_file in [x for x in os.listdir(args.db) if x.endswith('.csv')]:
