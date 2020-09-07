@@ -57,6 +57,8 @@ You should also specify a metadata file with the CT information, it should look 
 
 **See example in templates/ct_metadata.csv**
 
+If the data is OXFORD NANOPORE. Please use the ---ont flag!
+
 Minimum usage should therefore be:
 
 ```
