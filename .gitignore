@@ -2,7 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+ronaldo_db/
+ronaldo_out/
+.vscode/
 # C extensions
 *.so
 
