@@ -1,5 +1,7 @@
-# ronaldo
+# ronaLDO
 Comparison tool of SARSCOV2 seq and assays
+
+(Co) 'Rona + LOD = RonaLDO
 
 ## Install
 
@@ -13,6 +15,8 @@ python ronaldo/ronaldo.py -h
 ## How to run 
 There are two stages to run, first to calculate the required metrics (genome coverage, genome recovery, number of reads \[Illumina\]) and then to filter based on cut-offs. 
 If you already have the required statistics you can skip to the filter step. 
+
+There is a dirty helper script ronaldo/generate_slurm.py which can help you make slurm submission scripts to run through each seqeuncing run. 
 
 ### Calculating run metrics 
 The calculate module helps generate values for the different metrics. The required inputs are the directory of BAM files for a given run (specified with runname)
