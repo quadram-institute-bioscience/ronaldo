@@ -43,6 +43,8 @@ def main(args):
             write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata)
 
 def write_pbs(output_dir, runname, datadir, blanks, ctdata):
+    if not path.exists(output_dir):
+        os.mkdir(output_dir)
     output_script_path  = path.join(output_dir, f'ronaldo.{runname}.sh')
     with open(output_script_path, 'w') as out_handle:
         out_handle.write('#!/bin/bash\n')
