@@ -1,0 +1,1 @@
+runname,filename,sequencing_platform,sample_name,ct_platform_1,ct_platform_2,max_ct_value,min_ct_value,blank_coverage,blank_recovery_10,blank_recovery_20,blank_reads,mean_cov,pc_pos_gte_20,pc_pos_gte_10,no_reads
