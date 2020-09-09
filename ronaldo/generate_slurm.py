@@ -37,7 +37,7 @@ def main(args):
             blank_list = []
             for bam_file in os.listdir(valid_read_path):
                 for blank_name in args.blank_prefix:                        
-                    if bam_file.lower().startswith(blank_name.lower()):
+                    if bam_file.lower().startswith(blank_name.lower()) and bam_file.endswith('sorted.bam'):
                         blank_list.append(bam_file)
                         break
             write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata)
