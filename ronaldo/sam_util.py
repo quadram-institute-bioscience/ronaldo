@@ -17,7 +17,7 @@ def get_genome_metrics(bam_file):
                     recovery_10 += 1 
                 if int(coord[2]) > 20:
                     recovery_20 += 1 
-    except pysam.utils.SamtoolsError as ex:
+    except (pysam.utils.SamtoolsError, OSError) as ex:
         logging.error(f'Error opening BAM file {bam_file}')
         logging.error(ex)
         return 0,0,0
