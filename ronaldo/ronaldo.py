@@ -7,6 +7,8 @@ ronaldo calculate false positive rates for different assays
 ### CHANGE LOG ### 
 2020-09-03 Nabil-Fareed Alikhan <nabil@happykhan.com>
     * Initial build - split from dirty scripts
+2020-09-09 Nabil-Fareed Alikhan <nabil@happykhan.com>
+    * Fixes for cases where NO reads mapp. => div0 errors
 """
 import collections
 import logging
