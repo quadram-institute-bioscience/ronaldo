@@ -22,7 +22,7 @@ from sam_util import get_genome_metrics, get_well_mapped_reads
 import csv
 
 epi = "Licence: " + meta.__licence__ +  " by " +meta.__author__ + " <" +meta.__author_email__ + ">"
-logging.basicConfig()
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 log = logging.getLogger()
 
 def check_blanks(blank_list, ref_length=29000, read_length=148):
@@ -55,6 +55,7 @@ def get_sample_metrics(bam_file, platform='OXFORD_NANOPORE'):
 
 def calculate_metrics(args): 
     # prepopulate ct data from input table 
+    log.info(f'Starting RonaLDO on {args.runname}')
     existing_sample_info = {}
     output_sample_info = []
     platform = 'ILLUMINA'
@@ -104,11 +105,13 @@ def calculate_metrics(args):
                     output_sample_info.append(new_output_sample_info)
                 else:
                     log.warning(f'No data for {bam_filename}')
-            db_path = path.join(args.db, f'ronaldo.db.{args.runname}.csv')
-            db_out = csv.DictWriter(open(db_path, 'w'), fieldnames=output_sample_info[0].keys())
-            db_out.writeheader()
-            db_out.writerows(output_sample_info)
-
+            if output_sample_info:
+                db_path = path.join(args.db, f'ronaldo.db.{args.runname}.csv')
+                db_out = csv.DictWriter(open(db_path, 'w'), fieldnames=output_sample_info[0].keys())
+                db_out.writeheader()
+                db_out.writerows(output_sample_info)
+            else:
+                log.warning('No data found in table')
 
 def assess_run(args):
     # Read dir. 
@@ -142,10 +145,13 @@ def assess_run(args):
     if not path.exists(args.output):
         os.mkdir(args.output)
     out_file_path = path.join(args.output, f'ronaldo.{args.sitename}.summary.csv')
-    with open(out_file_path, 'w') as out_handle:
-        out_dict = csv.DictWriter(out_handle, fieldnames=list(all_records.values())[0].keys())
-        out_dict.writeheader()
-        out_dict.writerows(all_records.values())
+    if all_records:
+        with open(out_file_path, 'w') as out_handle:
+            out_dict = csv.DictWriter(out_handle, fieldnames=list(all_records.values())[0].keys())
+            out_dict.writeheader()
+            out_dict.writerows(all_records.values())
+    else:
+        log.warning('No data found in table')
 
 def is_valid_dir(parser, arg):
     if not path.exists(arg):
