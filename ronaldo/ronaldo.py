@@ -25,7 +25,7 @@ import csv
 
 epi = "Licence: " + meta.__licence__ +  " by " +meta.__author__ + " <" +meta.__author_email__ + ">"
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
-log = logging.getLogger(__name__)
+log = logging.getLogger(__name__j)
 
 def check_blanks(blank_list, ref_length=29000, read_length=148):
     max_coverage = 0

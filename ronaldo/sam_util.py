@@ -42,7 +42,7 @@ def get_well_mapped_reads(bam_file, read_length=148):
                 match_lengths = [match[1] - match[0] for match in read.cigar]
                 if sum(match_lengths) >= read_length:
                     no_reads += 1
-    except pysam.utils.SamtoolsError as ex:
+    except (pysam.utils.SamtoolsError, OSError) as ex:
         logging.error(f'Error opening BAM file {bam_file}')
         logging.error(ex)
         return 0,0,0
