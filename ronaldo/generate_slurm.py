@@ -27,10 +27,12 @@ def main(args):
         illumina_read_path = path.join(args.data_dir, dir, 'ncovIllumina_sequenceAnalysis_readMapping/')
         ont_read_path  = path.join(args.data_dir, dir, 'articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka')
         valid_read_path = None
+        ont = False
         if path.exists(illumina_read_path):
             valid_read_path = illumina_read_path
         elif path.exists(illumina_read_path):
             valid_read_path = ont_read_path
+            ont = True
         runname_match = re.match('.+\.(20\d+).*', dir)
         if runname_match and valid_read_path:
             runname = runname_match.group(1)
@@ -40,9 +42,9 @@ def main(args):
                     if bam_file.lower().startswith(blank_name.lower()) and bam_file.endswith('sorted.bam'):
                         blank_list.append(bam_file)
                         break
-            write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata)
+            write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata, ont)
 
-def write_pbs(output_dir, runname, datadir, blanks, ctdata):
+def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False):
     if not path.exists(output_dir):
         os.mkdir(output_dir)
     output_script_path  = path.join(output_dir, f'ronaldo.{runname}.sh')
@@ -57,7 +59,11 @@ def write_pbs(output_dir, runname, datadir, blanks, ctdata):
         out_handle.write('source ~/ronaldo/venv/bin/activate\n')
         out_handle.write('cd ~/ronaldo/\n')
         blanks = ' '.join(blanks)
-        out_handle.write(f'python ronaldo/ronaldo.py calculate --ctdata {ctdata} {runname} {datadir} {blanks}\n')
+        if ont:
+            cmd = f'python ronaldo/ronaldo.py calculate --ont --ctdata {ctdata} {runname} {datadir} {blanks}'
+        else:
+            cmd = f'python ronaldo/ronaldo.py calculate --ctdata {ctdata} {runname} {datadir} {blanks}'
+        out_handle.write(cmd + '\n')
 
 if __name__ == '__main__':
     start_time = time.time()
