@@ -88,7 +88,7 @@ def calculate_metrics(args):
             log.info('RUN SKIPPED: Specified Blanks from this run have too much SARSCOV2 content')
         else:
             log.info('BLANKS OK!')
-            for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam]: 
+            for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam and bam_file.endswith('.bam')]: 
                 log.debug(f'Fetching coverage for {bam_file}')
                 recovery_10, recovery_20, coverage, reads = get_genome_metrics(bam_file, platform=platform, verbose=args.verbose, temp=args.tempdir)
                 bam_filename = path.basename(bam_file)
