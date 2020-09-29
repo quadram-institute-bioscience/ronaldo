@@ -2,7 +2,7 @@
 """
 Trash script to locate files for a given sample
 
-Because naming things ten different ways is how to go.
+Because naming things ten different ways is just what we do.
 
 ### CHANGE LOG ### 
 2020-09-03 Nabil-Fareed Alikhan <nabil@happykhan.com>

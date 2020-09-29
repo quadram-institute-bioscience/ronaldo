@@ -20,20 +20,23 @@ import argparse
 import meta
 import sys
 import time
-from sam_util import get_genome_metrics, get_well_mapped_reads
+from sam_util import get_genome_metrics_nanopore, get_genome_metrics_illumina, get_well_mapped_reads
 
 epi = "Licence: " + meta.__licence__ +  " by " +meta.__author__ + " <" +meta.__author_email__ + ">"
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 log = logging.getLogger(__name__)
 
-def check_blanks(blank_list, ref_length=29000, read_length=148):
+def check_blanks(blank_list, ref_length=29000, read_length=148, platform="ILLUMINA"):
     max_coverage = 0
     max_recovery_10 = 0
     max_recovery_20 = 0
     max_reads = 0
     # TODO: Logic to handle Illumina or Nanopore
     for bam_file in blank_list:
-        current_recovery_10, current_recovery_20, current_coverage  = get_genome_metrics(bam_file)
+        if platform == 'ILLUMINA':
+            current_recovery_10, current_recovery_20, current_coverage  = get_genome_metrics_illumina(bam_file)
+        else:
+            current_recovery_10, current_recovery_20, current_coverage  = get_genome_metrics_nanopore(bam_file)
         current_reads, current_mapped_reads, current_total_bases = get_well_mapped_reads(bam_file, read_length)
         if current_recovery_10 > max_recovery_10:
             max_recovery_10 = current_recovery_10
