@@ -153,6 +153,16 @@ def assess_run(args):
     else:
         log.warning('No data found in table')
 
+from plot_util import fetch_data, ct_plot, platform_plot
+
+def plot_data(args):
+    all_values = {}
+    for table_path in [os.path.join(args.output, x) for x in os.listdir(args.output) if x.endswith('.csv')]:
+        all_values.update(fetch_data(table_path))
+    ct_plot(all_values.values(), args.output)
+    platform_plot(all_values.values(), args.output)
+
+
 def is_valid_dir(parser, arg):
     if not path.exists(arg):
         parser.error("The directory %s does not exist!" % arg)
@@ -193,6 +203,10 @@ if __name__ == '__main__':
     filter_parser.add_argument('-t','--totalreads',action='store',help='Minimum total number of mapped reads', default=30)
     filter_parser.add_argument('sitename', action='store', help='Informative label for your site')    
     filter_parser.set_defaults(func=assess_run)
+
+    plot_parser = subparsers.add_parser('plot', help='Make some plots of the summary')
+    plot_parser.add_argument('-o','--output',action='store',help='output directory', default='ronaldo_out')
+    plot_parser.set_defaults(func=plot_data)
 
     args = parser.parse_args()
     if args.verbose: 
