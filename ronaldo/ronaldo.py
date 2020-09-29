@@ -8,7 +8,7 @@ ronaldo calculate false positive rates for different assays
 2020-09-03 Nabil-Fareed Alikhan <nabil@happykhan.com>
     * Initial build - split from dirty scripts
 2020-09-09 Nabil-Fareed Alikhan <nabil@happykhan.com>
-    * Fixes for cases where NO reads mapp. => div0 errors
+    * Fixes for cases where NO reads map. => div0 errors
 """
 import collections
 import logging
@@ -21,7 +21,6 @@ import meta
 import sys
 import time
 from sam_util import get_genome_metrics, get_well_mapped_reads
-import csv
 
 epi = "Licence: " + meta.__licence__ +  " by " +meta.__author__ + " <" +meta.__author_email__ + ">"
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
@@ -128,6 +127,11 @@ def assess_run(args):
     for record in all_records.values():
         failed = 0
         record['false_positive'] = False
+        # We need to handle where no. blank reads are 0 (esp. for Nanopore) - Suggested by Matt Loose
+        corrected_blank_recovery_20 = float(record.get('blank_recovery_20'))
+        if corrected_blank_recovery_20 == 0:
+            corrected_blank_recovery_20 = 1.00
+
         if float(record.get('mean_cov')) * args.coverage < float(record.get('blank_coverage')):
             failed += 1        
         if record.get('sequencing_platform') == 'ILLUMINA':
@@ -138,7 +142,7 @@ def assess_run(args):
             if failed == 3: 
                 record['false_positive'] = True
         else:
-            if float(record.get('pc_pos_gte_20')) < float(record.get('blank_recovery_20')) * args.recovery:
+            if float(record.get('pc_pos_gte_20')) < corrected_blank_recovery_20 * args.recovery:
                 failed += 1
             if failed == 2: 
                 record['false_positive'] = True
