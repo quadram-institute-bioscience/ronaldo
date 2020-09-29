@@ -29,7 +29,7 @@ def get_genome_metrics_nanopore(bam_file):
     return round(float(recovery_10) / total_bases * 100, 2) , round(float(recovery_20) / total_bases * 100, 2), round(float(sum(coverage)) / len(coverage),3)
 
 
-def get_genome_metrics_nanopore(bam_file):
+def get_genome_metrics_illumina(bam_file):
     recovery_20 = 0 
     recovery_10 = 0 
     total_bases = 0
