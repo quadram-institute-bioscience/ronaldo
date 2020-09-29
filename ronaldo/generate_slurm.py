@@ -42,9 +42,9 @@ def main(args):
                     if bam_file.lower().startswith(blank_name.lower()) and bam_file.endswith('sorted.bam'):
                         blank_list.append(bam_file)
                         break
-            write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata, ont)
+            write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata, ont, tempdir=args.tempdir)
 
-def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False):
+def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=None):
     if not path.exists(output_dir):
         os.mkdir(output_dir)
     output_script_path  = path.join(output_dir, f'ronaldo.{runname}.sh')
@@ -59,10 +59,12 @@ def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False):
         out_handle.write('source ~/ronaldo/venv/bin/activate\n')
         out_handle.write('cd ~/ronaldo/\n')
         blanks = ' '.join(blanks)
+        cmd = 'python ronaldo/ronaldo.py calculate' 
+        if tempdir: 
+            cmd += f' --tempdir {tempdir} '
         if ont:
-            cmd = f'python ronaldo/ronaldo.py calculate --ont --ctdata {ctdata} {runname} {datadir} {blanks}'
-        else:
-            cmd = f'python ronaldo/ronaldo.py calculate --ctdata {ctdata} {runname} {datadir} {blanks}'
+            cmd += ' --ont '
+        cmd += f'  --ctdata {ctdata} {runname} {datadir} {blanks}'
         out_handle.write(cmd + '\n')
 
 if __name__ == '__main__':
@@ -76,6 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('data_dir', action='store', help='Dir with data dirs')
     parser.add_argument('ctdata', action='store', help='ct_data file')
     parser.add_argument('blank_prefix', metavar='N', nargs='+',  help='Prefix to find blanks')
+    parser.add_argument('--tempdir',action='store',help='temp directory')
 
     args = parser.parse_args()
     if args.verbose: 

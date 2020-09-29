@@ -20,9 +20,9 @@ import argparse
 import meta
 import sys
 import time
-from sam_util import get_genome_metrics_nanopore, get_genome_metrics_illumina, get_well_mapped_reads
+from sam_util import get_genome_metrics
 
-epi = "Licence: " + meta.__licence__ +  " by " +meta.__author__ + " <" +meta.__author_email__ + ">"
+epi = "Licence: " + meta.__licence__ +  " by " + meta.__author__ + " <" +meta.__author_email__ + ">"
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 log = logging.getLogger(__name__)
 
@@ -31,13 +31,8 @@ def check_blanks(blank_list, ref_length=29000, read_length=148, platform="ILLUMI
     max_recovery_10 = 0
     max_recovery_20 = 0
     max_reads = 0
-    # TODO: Logic to handle Illumina or Nanopore
     for bam_file in blank_list:
-        if platform == 'ILLUMINA':
-            current_recovery_10, current_recovery_20, current_coverage  = get_genome_metrics_illumina(bam_file)
-        else:
-            current_recovery_10, current_recovery_20, current_coverage  = get_genome_metrics_nanopore(bam_file)
-        current_reads, current_mapped_reads, current_total_bases = get_well_mapped_reads(bam_file, read_length)
+        current_recovery_10, current_recovery_20, current_coverage, current_reads  = get_genome_metrics(bam_file, platform=platform, verbose=args.verbose, temp=args.tempdir)
         if current_recovery_10 > max_recovery_10:
             max_recovery_10 = current_recovery_10
             max_recovery_20 = current_recovery_20
@@ -47,16 +42,6 @@ def check_blanks(blank_list, ref_length=29000, read_length=148, platform="ILLUMI
             max_reads = current_reads                        
     return max_coverage, max_recovery_10, max_recovery_20, max_reads
 
-def get_sample_metrics(bam_file, platform='OXFORD_NANOPORE'):
-    coverage = 0
-    recovery_10 = 0
-    recovery_20 = 0
-    reads = 0
-    recovery_10, recovery_20, coverage = get_genome_metrics(bam_file)
-    if platform == 'ILLUMINA':
-        reads, any_mapped_reads, total_bases = get_well_mapped_reads(bam_file)
-    return coverage, recovery_10, recovery_20, reads
-
 def calculate_metrics(args): 
     # prepopulate ct data from input table 
     log.info(f'Starting RonaLDO on {args.runname}')
@@ -65,7 +50,9 @@ def calculate_metrics(args):
     platform = 'ILLUMINA'
     if args.ont:
         platform = 'OXFORD_NANOPORE'
+    log.debug(f'Platform is {platform}')
     if args.ctdata:
+        log.debug(f'Reading ct data from  {args.ctdata}')
         for record in csv.DictReader(open(args.ctdata), dialect=csv.excel): 
             existing_sample_info[record["filename"]] = dict(runname=args.runname, filename=record["filename"], sequencing_platform = platform, sample_name=record["sample_name"], ct_platform_1 = record.get('ct_platform_1', 'UNKNOWN'), ct_platform_2 = record.get('ct_platform_2', 'UNKNOWN'), max_ct_value=record.get("max_ct_value", 0), min_ct_value=record.get('max_ct_value',0))
     else:
@@ -76,12 +63,14 @@ def calculate_metrics(args):
     # Create path for blanks
     blank_paths = [path.join(args.bamfolder, blank_file) for blank_file in args.blankbam]
     input_good = True
+    log.debug(f'Locating blanks')
     for blank_path in blank_paths:
         if not path.exists(blank_path):
             log.error(f'Filepath to Blank does not exist: {blank_path}')
             input_good = False
     if input_good:
         #Create output dir 
+        log.debug(f'Input is good, proceeding')
         if not path.exists(args.db):
             mkdir(args.db)
         # Check blanks
@@ -100,7 +89,8 @@ def calculate_metrics(args):
         else:
             log.info('BLANKS OK!')
             for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam]: 
-                coverage, recovery_10, recovery_20, reads = get_sample_metrics(bam_file, platform=platform)
+                log.debug(f'Fetching coverage for {bam_file}')
+                recovery_10, recovery_20, coverage, reads = get_genome_metrics(bam_file, platform=platform, verbose=args.verbose, temp=args.tempdir)
                 bam_filename = path.basename(bam_file)
                 new_output_sample_info = existing_sample_info.get(bam_filename)
                 if new_output_sample_info:
@@ -110,6 +100,7 @@ def calculate_metrics(args):
                 else:
                     log.warning(f'No data for {bam_filename}')
             if output_sample_info:
+                log.debug(f'Writing output to table: ronaldo.db.{args.runname}.csv')
                 db_path = path.join(args.db, f'ronaldo.db.{args.runname}.csv')
                 db_out = csv.DictWriter(open(db_path, 'w'), fieldnames=output_sample_info[0].keys())
                 db_out.writeheader()
@@ -186,6 +177,7 @@ if __name__ == '__main__':
     metrics_parser.add_argument('--blank_recovery_cutoff', action='store', default=4.0, help='Run skipped if blanks have higher perc. genome recovery')
     metrics_parser.add_argument('--ont', action='store_true', default=False, help='Data is OXFORD NANOPORE')
     metrics_parser.add_argument('-l','--readlen',action='store',help='Minimum length for a mapped read (use with ILLUMINA only)', default=148)
+    metrics_parser.add_argument('--tempdir', action='store', help='Temp dir for temporary filtered BAM files')    
     metrics_parser.add_argument('runname', action='store', help='Informative label for this run')    
     metrics_parser.add_argument('bamfolder', action='store', help='Folder of SARSCOV2 BAM files', type=lambda x: is_valid_dir(metrics_parser, x))
     metrics_parser.add_argument('blankbam', metavar='N', nargs='+', help='Negative control BAM file')
