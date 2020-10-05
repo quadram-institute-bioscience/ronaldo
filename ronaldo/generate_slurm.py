@@ -30,7 +30,7 @@ def main(args):
         ont = False
         if path.exists(illumina_read_path):
             valid_read_path = illumina_read_path
-        elif path.exists(illumina_read_path):
+        elif path.exists(ont_read_path):
             valid_read_path = ont_read_path
             ont = True
         runname_match = re.match('.+\.(20\d+).*', dir)
