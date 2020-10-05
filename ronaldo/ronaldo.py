@@ -74,7 +74,7 @@ def calculate_metrics(args):
         if not path.exists(args.db):
             mkdir(args.db)
         # Check blanks
-        blank_coverage, blank_recovery_10, blank_recovery_20, blank_reads = check_blanks(blank_paths)
+        blank_coverage, blank_recovery_10, blank_recovery_20, blank_reads = check_blanks(blank_paths, platform=platform)
         log.info(f'Max blank genome coverage: {blank_coverage}')
         log.info(f'Max blank genome recovery >10X: {blank_recovery_10}')
         log.info(f'Max blank genome recovery >20X: {blank_recovery_20}')
