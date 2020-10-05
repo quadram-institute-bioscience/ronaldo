@@ -37,11 +37,11 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
                         temp_bam.write(read)
             bam.close()
             temp_bam.close()
-            pysam.index(fd.name)
             clean_bam_file = fd.name
         else:
             clean_bam_file = bam_file
         log.debug('Fetching read stats for ' + os.path.basename(bam_file) )
+        pysam.index(clean_bam_file)
         for stat_line in pysam.idxstats(clean_bam_file).split('\n'):
             if stat_line.startswith('*'):
                 unmapped_reads = int(stat_line.split('\t')[2]) + int(stat_line.split('\t')[3])
