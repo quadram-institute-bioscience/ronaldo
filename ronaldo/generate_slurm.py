@@ -64,6 +64,7 @@ def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=N
         out_handle.write('source python-3.7.2\n')
         out_handle.write('source ~/ronaldo/venv/bin/activate\n')
         out_handle.write('cd ~/ronaldo/\n')
+        out_handle.write('echo -e job script  ronaldo.{plat}.{runname} \n')
         blanks = ' '.join(blanks)
         cmd = 'python ronaldo/ronaldo.py --verbose calculate' 
         if tempdir: 
