@@ -38,7 +38,7 @@ def main(args):
         for dir in result_dirs: 
             file_dir_path =  os.path.join(args.datadir, dir, "ncovIllumina_sequenceAnalysis_readMapping")
             sample_name = record["central_sample_id"].split('-')[1]
-            filename = [x for x in os.listdir(file_dir_path) if x.startswith(sample_name)]
+            filename = [x for x in os.listdir(file_dir_path) if x.startswith(sample_name) and x.endswith('.bam')]
             if filename:
                 if filename[0] != '':
                     new_dict['filename'] = filename[0]

@@ -121,22 +121,18 @@ def assess_run(args):
     for record in all_records.values():
         failed = 0
         record['false_positive'] = False
-        # We need to handle where no. blank reads are 0 (esp. for Nanopore) - Suggested by Matt Loose
-        corrected_blank_recovery_20 = float(record.get('blank_recovery_20'))
-        if corrected_blank_recovery_20 == 0:
-            corrected_blank_recovery_20 = 1.00
-
-        if float(record.get('mean_cov')) * args.coverage < float(record.get('blank_coverage')):
+        # We need to handle where no. blank reads are 0 (esp. for Nanopore) 
+        if float(record.get('mean_cov')) * args.coverage < float(record.get('blank_coverage')) or float(record.get('mean_cov')) < float(args.mincoverage):
             failed += 1        
         if record.get('sequencing_platform') == 'ILLUMINA':
-            if float(record.get('pc_pos_gte_10'))  < float(record.get('blank_recovery_10')) * args.recovery:
+            if float(record.get('pc_pos_gte_10'))  < float(record.get('blank_recovery_10')) * float(args.recovery) or float(record.get('pc_pos_gte_10'))  < float(args.minrecovery):
                 failed += 1
-            if float(record.get('no_reads')) < float(record.get('blank_reads')) * args.noreads or float(record.get('no_reads')) < args.totalreads:
+            if float(record.get('no_reads')) < float(record.get('blank_reads')) * args.noreads or float(record.get('no_reads')) < float(args.totalreads):
                 failed += 1
             if failed == 3: 
                 record['false_positive'] = True
         else:
-            if float(record.get('pc_pos_gte_20')) < corrected_blank_recovery_20 * args.recovery:
+            if float(record.get('pc_pos_gte_20')) < float(record.get('blank_recovery_20')) * args.recovery or float(record.get('pc_pos_gte_20')) < float(args.minrecovery):
                 failed += 1
             if failed == 2: 
                 record['false_positive'] = True
@@ -201,6 +197,9 @@ if __name__ == '__main__':
     filter_parser.add_argument('-r','--recovery',action='store',help='Minimum fold genome recovery for mapped reads', default=2)    
     filter_parser.add_argument('-n','--noreads',action='store',help='Minimum fold number of mapped reads', default=5)
     filter_parser.add_argument('-t','--totalreads',action='store',help='Minimum total number of mapped reads', default=30)
+    filter_parser.add_argument('--mincoverage',action='store',help='Minimum Absolute genome coverage for mapped reads', default=2)
+    filter_parser.add_argument('--minrecovery',action='store',help='Minimum Absolute genome recovery for mapped reads', default=2)    
+    filter_parser.add_argument('--minnoreads',action='store',help='Minimum Absolute number of mapped reads', default=5)
     filter_parser.add_argument('sitename', action='store', help='Informative label for your site')    
     filter_parser.set_defaults(func=assess_run)
 

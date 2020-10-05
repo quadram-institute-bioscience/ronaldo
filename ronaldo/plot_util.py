@@ -43,9 +43,11 @@ def platform_plot(data, output_dir):
     platform_count_2 = Counter([x['ct_platform_2'] for x in data])
     bp2 = plt.bar(platform_count_2.keys(), platform_count_2.values())
     plt.xlabel('Diagnostic platform')
+    plt.xticks(rotation=45)
+    plt.legend()
     plt.ylabel('Count')    
-    plt.savefig(output_dir  + '/ronaldo.platform_plot.png')
-    plt.savefig(output_dir  + '/ronaldo.platform_plot.svg')    
+    plt.savefig(output_dir  + '/ronaldo.platform_plot.png', bbox_inches='tight')
+    plt.savefig(output_dir  + '/ronaldo.platform_plot.svg', bbox_inches='tight')    
 
 def ct_plot(data, output_dir):
 
