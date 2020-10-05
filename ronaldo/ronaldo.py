@@ -89,6 +89,7 @@ def calculate_metrics(args):
         else:
             log.info('BLANKS OK!')
             for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam and bam_file.endswith('.bam')]: 
+                bam_filename = path.basename(bam_file)
                 new_output_sample_info = existing_sample_info.get(bam_filename)
                 if new_output_sample_info:                
                     log.debug(f'Fetching coverage for {bam_file}')
@@ -97,7 +98,6 @@ def calculate_metrics(args):
                     log.debug(f'Genome recovery >10X: {recovery_10}')
                     log.debug(f'Genome recovery >20X: {recovery_20}')
                     log.debug(f'Number of mapped reads: {reads}')                
-                    bam_filename = path.basename(bam_file)
                     new_output_sample_info.update(dict(blank_coverage=blank_coverage, blank_recovery_10=blank_recovery_10, blank_recovery_20=blank_recovery_20,blank_reads=blank_reads))
                     new_output_sample_info.update(dict(mean_cov=coverage, pc_pos_gte_20=recovery_20, pc_pos_gte_10=recovery_10, no_reads=reads))
                     output_sample_info.append(new_output_sample_info)
