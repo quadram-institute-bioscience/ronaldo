@@ -42,7 +42,10 @@ def main(args):
                     if bam_file.lower().startswith(blank_name.lower()) and bam_file.endswith('sorted.bam'):
                         blank_list.append(bam_file)
                         break
-            write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata, ont, tempdir=args.tempdir)
+            if len(blank_list) > 0: 
+                write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata, ont, tempdir=args.tempdir)
+            else: 
+                log.error('no blanks found for ' + runname)
 
 def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=None):
     if not path.exists(output_dir):
