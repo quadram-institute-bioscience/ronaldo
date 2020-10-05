@@ -91,6 +91,10 @@ def calculate_metrics(args):
             for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam and bam_file.endswith('.bam')]: 
                 log.debug(f'Fetching coverage for {bam_file}')
                 recovery_10, recovery_20, coverage, reads = get_genome_metrics(bam_file, platform=platform, verbose=args.verbose, temp=args.tempdir)
+                log.debug(f'Genome coverage: {coverage}')
+                log.debug(f'Genome recovery >10X: {recovery_10}')
+                log.debug(f'Genome recovery >20X: {recovery_20}')
+                log.debug(f'Number of mapped reads: {reads}')                
                 bam_filename = path.basename(bam_file)
                 new_output_sample_info = existing_sample_info.get(bam_filename)
                 if new_output_sample_info:
