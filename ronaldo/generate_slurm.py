@@ -39,7 +39,7 @@ def main(args):
             blank_list = []
             for bam_file in os.listdir(valid_read_path):
                 for blank_name in args.blank_prefix:                        
-                    if bam_file.lower().startswith(blank_name.lower()) and bam_file.endswith('sorted.bam'):
+                    if bam_file.lower().startswith(blank_name.lower()) and bam_file.endswith('.bam'):
                         blank_list.append(bam_file)
                         break
             if len(blank_list) > 0: 
