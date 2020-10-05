@@ -65,12 +65,12 @@ def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=N
         out_handle.write('source ~/ronaldo/venv/bin/activate\n')
         out_handle.write('cd ~/ronaldo/\n')
         blanks = ' '.join(blanks)
-        cmd = 'python ronaldo/ronaldo.py calculate' 
+        cmd = 'python ronaldo/ronaldo.py --verbose calculate' 
         if tempdir: 
             cmd += f' --tempdir {tempdir} '
         if ont:
             cmd += ' --ont '
-        cmd += f'  --verbose --ctdata {ctdata} {runname} {datadir} {blanks}'
+        cmd += f'   --ctdata {ctdata} {runname} {datadir} {blanks}'
         out_handle.write(cmd + '\n')
 
 if __name__ == '__main__':
