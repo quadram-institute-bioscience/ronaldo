@@ -41,6 +41,7 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
         else:
             clean_bam_file = bam_file
         log.debug('Fetching read stats for ' + os.path.basename(bam_file) )
+        log.debug('Path: ' + clean_bam_file)
         pysam.index(clean_bam_file)
         for stat_line in pysam.idxstats(clean_bam_file).split('\n'):
             if stat_line.startswith('*'):
