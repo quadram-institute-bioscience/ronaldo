@@ -47,14 +47,17 @@ def main(args):
 def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=None):
     if not path.exists(output_dir):
         os.mkdir(output_dir)
-    output_script_path  = path.join(output_dir, f'ronaldo.{runname}.sh')
+    plat = 'illumina'
+    if ont:
+        plat = 'nanopore'
+    output_script_path  = path.join(output_dir, f'ronaldo.{plat}.{runname}.sh')
     with open(output_script_path, 'w') as out_handle:
         out_handle.write('#!/bin/bash\n')
         out_handle.write('#SBATCH -p qib-long,nbi-short,nbi-medium,nbi-long\n')
         out_handle.write('#SBATCH -t 0-2:00\n')
         out_handle.write('#SBATCH -c 2\n')
-        out_handle.write(f'#SBATCH -J ronaldo.{runname}\n')
-        out_handle.write(f'#SBATCH -J ronaldo.{runname}\n')
+        out_handle.write(f'#SBATCH -J ronaldo.{plat}.{runname}\n')
+        out_handle.write(f'#SBATCH -J ronaldo.{plat}.{runname}\n')
         out_handle.write('source python-3.7.2\n')
         out_handle.write('source ~/ronaldo/venv/bin/activate\n')
         out_handle.write('cd ~/ronaldo/\n')
