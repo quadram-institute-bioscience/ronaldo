@@ -132,4 +132,12 @@ Minimum usage should therefore be:
 
 ```
 python ronaldo/ronaldo.py filter -d ronaldo_db  -o ronaldo_out  NORW 
+
+```
+### Plots 
+Creates some plots based on the *summary.csv in the output directory.
+
+```
+python ronaldo/ronaldo.py plot
+
 ```

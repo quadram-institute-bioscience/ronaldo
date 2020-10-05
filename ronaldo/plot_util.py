@@ -52,7 +52,7 @@ def platform_plot(data, output_dir):
     
 import csv 
 import os 
-def platform_fail_plot(data, output_dir):
+def platform_fail_plot(data, output_dir, plat_cut=50):
     # Absolute failure count
     fail_platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data if x['false_positive'] == 'True' and x['ct_platform_1'] != 'UNKNOWN']))
     bp = plt.bar(fail_platform_count_1.keys(), fail_platform_count_1.values())
@@ -70,14 +70,16 @@ def platform_fail_plot(data, output_dir):
     platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data]))
     platform_count_2 = Counter([x['ct_platform_2'] for x in data])
     fail_platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data if x['false_positive'] == 'True' and x['ct_platform_1'] != 'UNKNOWN']))
+    fail_platform_pct_1 = {}
     for plat, value in fail_platform_count_1.items():
-        fail_platform_count_1[plat] = value / platform_count_1[plat] *100.00
+        if platform_count_1[plat] >= plat_cut:
+            fail_platform_pct_1[plat] = value / platform_count_1[plat] *100.00
         fail_dict.append(dict(platform=plat,fail_count=value, total_count=platform_count_1[plat] ))
     out_file = os.path.join(output_dir, 'ronaldo.fail_table_plt1.csv')
     tab = csv.DictWriter(open(out_file, 'w'), fieldnames=['platform', 'fail_count', "total_count"])        
     tab.writeheader()
     tab.writerows(fail_dict)    
-    bp = plt.bar(fail_platform_count_1.keys(), fail_platform_count_1.values())
+    bp = plt.bar(fail_platform_pct_1.keys(), fail_platform_pct_1.values())
     fail_dict = []
     fail_platform_count_2 = dict(Counter([x['ct_platform_2'] for x in data if x['false_positive'] == 'True']))
     for plat, value in fail_platform_count_2.items():

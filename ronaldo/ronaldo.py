@@ -161,7 +161,7 @@ def plot_data(args):
         all_values.update(fetch_data(table_path))
     ct_plot(all_values.values(), args.output)
     platform_plot(all_values.values(), args.output)
-    platform_fail_plot(all_values.values(), args.output)
+    platform_fail_plot(all_values.values(), args.output, args.platcut)
 
 def is_valid_dir(parser, arg):
     if not path.exists(arg):
@@ -209,6 +209,7 @@ if __name__ == '__main__':
 
     plot_parser = subparsers.add_parser('plot', help='Make some plots of the summary')
     plot_parser.add_argument('-o','--output',action='store',help='output directory', default='ronaldo_out')
+    plot_parser.add_argument('--platcut',action='store',help='Number of samples needed for plots', default=50)    
     plot_parser.set_defaults(func=plot_data)
 
     args = parser.parse_args()
