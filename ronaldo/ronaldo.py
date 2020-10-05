@@ -85,7 +85,7 @@ def calculate_metrics(args):
         elif blank_recovery_10 > args.blank_recovery_cutoff and not args.ont:
             cov_cut_not_ok = True
         if cov_cut_not_ok or blank_reads > args.blank_read_cutoff:
-            log.info('RUN SKIPPED: Specified Blanks from this run have too much SARSCOV2 content')
+            log.info(f'RUN SKIPPED: Specified Blanks from this run {args.runname} have too much SARSCOV2 content')
         else:
             log.info('BLANKS OK!')
             for bam_file in [path.join(args.bamfolder, bam_file) for bam_file in listdir(args.bamfolder) if bam_file not in args.blankbam and bam_file.endswith('.bam')]: 
@@ -149,15 +149,15 @@ def assess_run(args):
     else:
         log.warning('No data found in table')
 
-from plot_util import fetch_data, ct_plot, platform_plot
+from plot_util import fetch_data, ct_plot, platform_plot, platform_fail_plot
 
 def plot_data(args):
     all_values = {}
-    for table_path in [os.path.join(args.output, x) for x in os.listdir(args.output) if x.endswith('.csv')]:
+    for table_path in [os.path.join(args.output, x) for x in os.listdir(args.output) if x.endswith('summary.csv')]:
         all_values.update(fetch_data(table_path))
     ct_plot(all_values.values(), args.output)
     platform_plot(all_values.values(), args.output)
-
+    platform_fail_plot(all_values.values(), args.output)
 
 def is_valid_dir(parser, arg):
     if not path.exists(arg):

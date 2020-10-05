@@ -22,11 +22,10 @@ log = logging.getLogger()
 
 def main(args): 
     all_samples = {} 
-    result_dirs = sorted([x for x in os.listdir(args.datadir) if x.startswith('result.illumina')], reverse=True)
-    
+    blacklist = ['result.illumina.20200930.depricated', 'result.ont.cog35.200929.single_end']
     for record in csv.DictReader(open(args.datfile), dialect=csv.excel_tab): 
         cts = [record.get("ct_1_ct_value", 0.0), record.get("ct_2_ct_value", 0.0)]
-        new_dict = dict(sequencing_platform = "ILLUMINA", sample_name=record["central_sample_id"], ct_platform_1 = record.get('ct_1_test_platform', 'UNKNOWN'), ct_platform_2 = record.get('ct_2_test_platform', 'UNKNOWN'), max_ct_value=max(cts), min_ct_value=min(cts))
+        new_dict = dict(sequencing_platform=record['instrument_make'], sample_name=record["central_sample_id"], ct_platform_1 = record.get('ct_1_test_platform', 'UNKNOWN'), ct_platform_2 = record.get('ct_2_test_platform', 'UNKNOWN'), max_ct_value=max(cts), min_ct_value=min(cts))
         if new_dict['ct_platform_1'] == '':
             new_dict['ct_platform_1'] = 'UNKNOWN'
         if new_dict['ct_platform_2'] == '':
@@ -35,20 +34,40 @@ def main(args):
             new_dict['max_ct_value'] = '0'
         if new_dict['min_ct_value'] == '':
             new_dict['min_ct_value'] = '0'
-        for dir in result_dirs: 
-            file_dir_path =  os.path.join(args.datadir, dir, "ncovIllumina_sequenceAnalysis_readMapping")
-            sample_name = record["central_sample_id"].split('-')[1]
-            filename = [x for x in os.listdir(file_dir_path) if x.startswith(sample_name) and x.endswith('.bam')]
-            if filename:
-                if filename[0] != '':
-                    new_dict['filename'] = filename[0]
-                    break
-        if new_dict.get('filename'):
-            all_samples[record["central_sample_id"]] = new_dict
+        all_samples[record["central_sample_id"]] = new_dict
+    result_dirs = sorted([x for x in os.listdir(args.datadir) if x.startswith('result.') and x not in blacklist ], reverse=True)
+    for dir in result_dirs: 
+        data_dir  =  os.path.join(args.datadir, dir)
+        qc_file = [x for x in os.listdir(data_dir) if x.endswith('qc.csv')]
+        if qc_file:
+            samples = [x for x in csv.DictReader(open(os.path.join(args.datadir, dir, qc_file[0]))) ] 
+            if dir.startswith('result.illumina'):
+                seq_plat = 'ILLUMINA'
+                file_dir_path =  os.path.join(args.datadir, dir, "ncovIllumina_sequenceAnalysis_trimPrimerSequences")
+            else:
+                seq_plat = 'OXFORD_NANOPORE'      
+                file_dir_path =  os.path.join(args.datadir, dir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka")            
+            for sample in samples:
+                if seq_plat == 'OXFORD_NANOPORE':
+                    sample_name = sample['sample_name']
+                else:
+                    sample_name = sample['sample_name'].split('_')[0]
+                    if not sample_name.startswith('NORW'):
+                        sample_name = 'NORW-' + sample_name                    
+                if all_samples.get(sample_name):
+                    bam_file_path = os.path.join(file_dir_path, sample['bam'])
+                    if os.path.exists(bam_file_path):
+                        all_samples[sample_name]['filename'] = sample['bam']
+                    else: 
+                        log.info('Path not found ' + bam_file_path)
+
+        else:
+            log.info(f'No QC file in {dir}')
     db_path = 'fixed.dat'
-    db_out = csv.DictWriter(open(db_path, 'w'), fieldnames=list(all_samples.values())[0].keys())
+    good_files = [x for x in all_samples.values() if x.get('filename')]
+    db_out = csv.DictWriter(open(db_path, 'w'), fieldnames=good_files[0].keys())
     db_out.writeheader()
-    db_out.writerows(all_samples.values())
+    db_out.writerows(good_files)
 
 
 

@@ -24,7 +24,7 @@ log = logging.getLogger()
 def main(args):
     log.info(args)
     for dir in os.listdir(args.data_dir):
-        illumina_read_path = path.join(args.data_dir, dir, 'ncovIllumina_sequenceAnalysis_readMapping/')
+        illumina_read_path = path.join(args.data_dir, dir, 'ncovIllumina_sequenceAnalysis_trimPrimerSequences/')
         ont_read_path  = path.join(args.data_dir, dir, 'articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka')
         valid_read_path = None
         ont = False
