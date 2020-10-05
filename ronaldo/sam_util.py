@@ -66,7 +66,8 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
         log.error(ex)
         return 0,0,0,0
     finally:
-        fd.close()        
+        if platform == 'ILLUMINA':
+            fd.close()        
     if total_bases != ref_length and total_bases > 0 :
         log.warn(f'SARSCOV reference genome not expected size, found {total_bases}')
     if total_bases == 0 or not coverage:
