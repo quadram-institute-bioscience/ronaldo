@@ -70,7 +70,7 @@ def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=N
             cmd += f' --tempdir {tempdir} '
         if ont:
             cmd += ' --ont '
-        cmd += f'  --ctdata {ctdata} {runname} {datadir} {blanks}'
+        cmd += f'  --verbose --ctdata {ctdata} {runname} {datadir} {blanks}'
         out_handle.write(cmd + '\n')
 
 if __name__ == '__main__':
