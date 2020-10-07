@@ -2,7 +2,8 @@ import csv
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import Counter
+from collections import Counter 
+import os 
 
 log = logging.getLogger(__name__)
 
@@ -49,9 +50,7 @@ def platform_plot(data, output_dir):
     plt.savefig(output_dir  + '/ronaldo.platform_plot.png', bbox_inches='tight')
     plt.savefig(output_dir  + '/ronaldo.platform_plot.svg', bbox_inches='tight')
     plt.close()
-    
-import csv 
-import os 
+
 def platform_fail_plot(data, output_dir, plat_cut=50):
     # Absolute failure count
     fail_platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data if x['false_positive'] == 'True' and x['ct_platform_1'] != 'UNKNOWN']))
