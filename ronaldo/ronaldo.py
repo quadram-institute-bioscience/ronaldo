@@ -35,6 +35,7 @@ def check_blanks(blank_list, ref_length=29000, read_length=148, platform="ILLUMI
         current_recovery_10, current_recovery_20, current_coverage, current_reads  = get_genome_metrics(bam_file, platform=platform, verbose=args.verbose, temp=args.tempdir)
         if current_recovery_10 > max_recovery_10:
             max_recovery_10 = current_recovery_10
+        if current_recovery_20 > max_recovery_20:            
             max_recovery_20 = current_recovery_20
         if current_coverage > max_coverage:
             max_coverage = current_coverage
