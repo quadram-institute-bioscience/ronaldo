@@ -36,15 +36,24 @@ def fetch_data(filename):
     for x in csv.DictReader(open(filename), dialect=csv.excel):
         values[x['sample_name']] = x 
         values[x['sample_name']]['site'] = filename.split('.')[1]
+        if values[x['sample_name']]['ct_platform_1'] == '':
+            values[x['sample_name']]['ct_platform_1'] = 'UNKNOWN'
+        if values[x['sample_name']]['ct_platform_2'] == '':
+            values[x['sample_name']]['ct_platform_2'] = 'UNKNOWN'
+        values[x['sample_name']]['site'] = filename.split('.')[1]
     return values
 
 def platform_plot(data, output_dir):
-    platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data]))
-    bp = plt.bar(platform_count_1.keys(), platform_count_1.values())
+    plt.style.use('ggplot')
+    all_sites = list(set([x['site'] for x in data]))
+
+    for site in all_sites:
+        platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data if x.get('site') == site]))
+        bp = plt.bar(platform_count_1.keys(), platform_count_1.values(), label=site)
     platform_count_2 = Counter([x['ct_platform_2'] for x in data])
     #bp2 = plt.bar(platform_count_2.keys(), platform_count_2.values())
     plt.xlabel('Diagnostic platform')
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=90, fontsize=8)
     plt.legend()
     plt.ylabel('Count')    
     plt.savefig(output_dir  + '/ronaldo.platform_plot.png', bbox_inches='tight')
@@ -53,6 +62,7 @@ def platform_plot(data, output_dir):
 
 def platform_fail_plot(data, output_dir, plat_cut=50):
     # Absolute failure count
+    plt.style.use('ggplot')
     fail_platform_count_1 = dict(Counter([x['ct_platform_1'] for x in data if x['false_positive'] == 'True' and x['ct_platform_1'] != 'UNKNOWN']))
     bp = plt.bar(fail_platform_count_1.keys(), fail_platform_count_1.values())
     fail_platform_count_2 = dict(Counter([x['ct_platform_2'] for x in data if x['false_positive'] == 'True']))
@@ -99,25 +109,27 @@ def platform_fail_plot(data, output_dir, plat_cut=50):
 
 
 def ct_plot(data, output_dir):
+    plt.style.use('ggplot')
 
     ct = {}
     ct_recovery = {}
     min_value = 25
     max_value = 38
     for x in data:   
-        ct_max = round(float(x.get('min_ct_value')))
-        if ct_max > 0:
-            if ct_max <= min_value:
-                ct_max = min_value
-            if ct_max >= max_value:
-                ct_max = max_value        
-            recovery = float(x.get('pc_pos_gte_20'))
-            if x.get('sequencing_platform') == 'ILLUMINA':
-                recovery = float(x.get('pc_pos_gte_10'))
-            if ct.get(ct_max):
-                ct[ct_max].append(recovery)
-            else:
-                ct[ct_max]= [recovery]
+        if x.get('min_ct_value') != '':
+            ct_max = round(float(x.get('min_ct_value', 0)))
+            if ct_max > 0:
+                if ct_max <= min_value:
+                    ct_max = min_value
+                if ct_max >= max_value:
+                    ct_max = max_value        
+                recovery = float(x.get('pc_pos_gte_20'))
+                if x.get('sequencing_platform') == 'ILLUMINA':
+                    recovery = float(x.get('pc_pos_gte_10'))
+                if ct.get(ct_max):
+                    ct[ct_max].append(recovery)
+                else:
+                    ct[ct_max]= [recovery]
 
     values = [ct[x] for x in sorted(ct)]
     fig, ax = plt.subplots()

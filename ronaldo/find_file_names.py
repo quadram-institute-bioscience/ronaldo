@@ -70,7 +70,6 @@ def main(args):
     db_out.writerows(good_files)
 
 
-
 if __name__ == '__main__':
     start_time = time.time()
     log.setLevel(logging.INFO)
