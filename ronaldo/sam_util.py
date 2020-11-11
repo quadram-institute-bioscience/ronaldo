@@ -55,23 +55,27 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
                 if len(stat_line) > 1:
                     ref_name = stat_line.split('\t')[0]
                     logging.warn(f'Other reference file detected, {ref_name}.')       
-        log.debug('Calculating depth for ' + os.path.basename(bam_file) )                    
-        for coord_line in pysam.depth(clean_bam_file ,'-a', '-d', '0').split('\n'):
-            coord = coord_line.split('\t')
-            if len(coord) > 2:
-                total_bases += 1
-                coverage.append(float(coord[2]))
-                if int(coord[2]) >= 10:
-                    recovery_10 += 1 
-                if int(coord[2]) > 20:
-                    recovery_20 += 1 
+        log.debug('Calculating depth for ' + os.path.basename(bam_file) )       
+        try:              
+            for coord_line in pysam.depth(clean_bam_file ,'-a', '-d', '0').split('\n'):
+                coord = coord_line.split('\t')
+                if len(coord) > 2:
+                    total_bases += 1
+                    coverage.append(float(coord[2]))
+                    if int(coord[2]) >= 10:
+                        recovery_10 += 1 
+                    if int(coord[2]) > 20:
+                        recovery_20 += 1 
+        except (pysam.utils.SamtoolsError, OSError) as ex:
+            log.error(f'Error opening BAM file {clean_bam_file}')
+            log.error(ex)
+            return 0,0,0,0                                    
     except (pysam.utils.SamtoolsError, OSError) as ex:
-        log.error(f'Error opening BAM file {clean_bam_file}')
+        log.error(f'Error opening BAM file {bam_file}')
         log.error(ex)
         return 0,0,0,0     
-    finally:
-        if platform == 'ILLUMINA' and fd:                    
-            fd.close()          
+    if platform == 'ILLUMINA' and fd:                    
+        fd.close()          
     if total_bases != ref_length and total_bases > 0 :
         log.warn(f'SARSCOV reference genome not expected size, found {total_bases}')
     if total_bases == 0 or not coverage:
