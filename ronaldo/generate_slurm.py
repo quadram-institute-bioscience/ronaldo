@@ -45,7 +45,7 @@ def main(args):
             if len(blank_list) > 0: 
                 write_pbs(args.output, runname, valid_read_path, blank_list ,args.ctdata, ont, tempdir=args.tempdir)
             else: 
-                log.error('no blanks found for ' + runname)
+                log.error('no blanks found for ' + runname + ' ' + valid_read_path)
 
 def write_pbs(output_dir, runname, datadir, blanks, ctdata, ont=False, tempdir=None):
     if not path.exists(output_dir):
