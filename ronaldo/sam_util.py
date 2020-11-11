@@ -10,7 +10,6 @@ log = logging.getLogger(__name__)
 def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read_length=148, verbose=False, temp=None):
     if verbose:
         log.setLevel(logging.DEBUG)
-    temp = '/qib/scratch/users/alikhan/ronaldo/'
     recovery_20 = 0 
     recovery_10 = 0 
     total_bases = 0
