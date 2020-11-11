@@ -116,7 +116,7 @@ def ct_plot(data, output_dir):
     min_value = 25
     max_value = 38
     for x in data:   
-        if x.get('min_ct_value') != '':
+        if x.get('min_ct_value') not in  ['', 'NA']:
             ct_max = round(float(x.get('min_ct_value', 0)))
             if ct_max > 0:
                 if ct_max <= min_value:

@@ -16,6 +16,7 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
     reads = 0 
     coverage = [ ]
     unmapped_reads = 0 
+    fd = None 
     try:
         # If illumina create temp bam of full mapped reads 
         if platform == 'ILLUMINA':
@@ -64,12 +65,13 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
                     recovery_10 += 1 
                 if int(coord[2]) > 20:
                     recovery_20 += 1 
-        if platform == 'ILLUMINA':                    
-            fd.close()
     except (pysam.utils.SamtoolsError, OSError) as ex:
         log.error(f'Error opening BAM file {bam_file}')
         log.error(ex)
-        return 0,0,0,0      
+        return 0,0,0,0     
+    finally:
+        if platform == 'ILLUMINA' and fd:                    
+            fd.close()          
     if total_bases != ref_length and total_bases > 0 :
         log.warn(f'SARSCOV reference genome not expected size, found {total_bases}')
     if total_bases == 0 or not coverage:
