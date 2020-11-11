@@ -66,7 +66,7 @@ def get_genome_metrics(bam_file, ref_length = 29903, platform = 'ILLUMINA', read
                 if int(coord[2]) > 20:
                     recovery_20 += 1 
     except (pysam.utils.SamtoolsError, OSError) as ex:
-        log.error(f'Error opening BAM file {bam_file}')
+        log.error(f'Error opening BAM file {clean_bam_file}')
         log.error(ex)
         return 0,0,0,0     
     finally:
